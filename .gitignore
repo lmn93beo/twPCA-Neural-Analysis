@@ -103,3 +103,6 @@ ENV/
 # csv and mat
 *.csv
 *.mat
+
+# pdfs
+*.pdf
