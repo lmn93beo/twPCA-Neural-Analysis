@@ -14,14 +14,14 @@ for i = 1 : N
     end
 end
 
-shorts_all_mat = zeros(N, longest);
+shorts_all_mat = nan(N, longest);
 for i = 1 : N
     elem_len = numel(shorts{i});
     shorts_all_mat(i, 1:elem_len) = shorts{i}; 
 end
 
 % Save as .csv file
-csvwrite('psth_short_all_neurons_171027.csv', shorts_all_mat);
+csvwrite('psth_short_all_neurons_nans_171102.csv', shorts_all_mat);
 
 %% Collect responses for long condition
 N = numel(longs);
@@ -34,12 +34,12 @@ for i = 1 : N
     end
 end
 
-longs_all_mat = zeros(N, longest);
+longs_all_mat = nan(N, longest);
 for i = 1 : N
     elem_len = numel(longs{i});
     longs_all_mat(i, 1:elem_len) = longs{i}; 
 end
 
 % Save as .csv file
-csvwrite('psth_long_all_neurons_171027.csv', longs_all_mat);
+csvwrite('psth_long_all_neurons_nans_171102.csv', longs_all_mat);
 
