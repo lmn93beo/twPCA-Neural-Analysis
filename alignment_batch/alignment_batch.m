@@ -57,6 +57,10 @@ handles.output = hObject;
 
 global params
 % Set up global parameters (constants)
+params.t_points_short = 7;
+params.t_points_long = 9;
+params.n_neurons = 105;
+params.dt_bin = 40; %ms
 params.times = [740, 760, 780, 800, 820, 840, 860, 1300, ...
     1340, 1380, 1420, 1460, 1500, 1540, 1580, 1620];
 params.palette = [0.87021914648212229, 0.92132256824298342, 0.9685044213763937;
@@ -75,6 +79,22 @@ params.palette = [0.87021914648212229, 0.92132256824298342, 0.9685044213763937;
  0.85033448673587075, 0.14686658977316416, 0.13633217993079583;
  0.7364705882352941, 0.080000000000000002, 0.10117647058823528;
  0.59461745482506734, 0.046136101499423293, 0.075586312956555157];
+
+% Load unaligned data
+short_psth = csvread('../psth_short_all_neurons_nans_171102.csv');
+long_psth = csvread('../psth_long_all_neurons_nans_171102.csv');
+
+reshaped_short_psth = reshape(short_psth, params.t_points_short, ...
+    params.n_neurons, []);
+reshaped_long_psth = reshape(long_psth, params.t_points_long, ...
+    params.n_neurons, []);
+reshaped_short_pad = padarray(reshaped_short_psth, ...
+    [0, 0, 46 - 25], nan, 'post');
+params.reshaped_all_pad = cat(1, reshaped_short_pad, reshaped_long_psth);
+
+% Pad short psth with nans and combine
+
+
 
 % Update handles structure
 guidata(hObject, handles);
@@ -103,7 +123,7 @@ function slider1_Callback(hObject, eventdata, handles)
 % Hints: get(hObject,'Value') returns position of slider
 %        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
 global params
-id = min(floor(get(hObject, 'Value')), 104);
+id = min(floor(get(hObject, 'Value')), 105);
 
 % Load the aligned activity
 align_filename = ['../neuron' num2str(id) '_init_linear_warp_affine_recons.csv'];
@@ -121,6 +141,7 @@ xlabel('Time (ms)');
 ylabel('Normalized PSTH');
 title('PSTH after alignment')
 
+% Plot all warp factors
 warp_filename = ['../neuron' num2str(id) '_init_linear_warp_affine_warp2.csv'];
 warpN = csvread(warp_filename);
 slope = size(warpN, 2)./(warpN(:,end) - warpN(:,1));
@@ -131,6 +152,20 @@ ylim([0, 1.2]);
 xlabel('Time (ms)');
 ylabel('Stretch');
 title('Warps at different trial lengths')
+
+% Plot the original data
+axes(handles.original_axes);
+size(params.reshaped_all_pad)
+for i = 1:16
+    plot(squeeze(params.reshaped_all_pad(i, id + 1, :)), ...
+        'Color', params.palette(i,:));
+    hold on;
+end
+hold off;
+xlabel('Time (ms)');
+ylabel('PSTH');
+title('PSTH before alignment')
+
 
 set(handles.neuronID_txt, 'String', num2str(id));
 guidata(hObject, handles);
